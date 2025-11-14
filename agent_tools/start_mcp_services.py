@@ -22,6 +22,9 @@ class MCPServiceManager:
         self.services = {}
         self.running = True
 
+        # Resolve tool directory to make script path resolution stable
+        self.tools_dir = Path(__file__).resolve().parent
+
         # Set default ports
         self.ports = {
             "math": int(os.getenv("MATH_HTTP_PORT", "8000")),
@@ -40,7 +43,7 @@ class MCPServiceManager:
         }
 
         # Create logs directory
-        self.log_dir = Path("../logs")
+        self.log_dir = (self.tools_dir / "../logs").resolve()
         self.log_dir.mkdir(exist_ok=True)
 
         # Set signal handlers
@@ -104,11 +107,11 @@ class MCPServiceManager:
 
     def start_service(self, service_id, config):
         """Start a single service"""
-        script_path = config["script"]
+        script_path = self.tools_dir / config["script"]
         service_name = config["name"]
         port = config["port"]
 
-        if not Path(script_path).exists():
+        if not script_path.exists():
             print(f"❌ Script file not found: {script_path}")
             return False
 
@@ -117,7 +120,10 @@ class MCPServiceManager:
             log_file = self.log_dir / f"{service_id}.log"
             with open(log_file, "w") as f:
                 process = subprocess.Popen(
-                    [sys.executable, script_path], stdout=f, stderr=subprocess.STDOUT, cwd=os.getcwd()
+                    [sys.executable, script_path],
+                    stdout=f,
+                    stderr=subprocess.STDOUT,
+                    cwd=str(self.tools_dir),
                 )
 
             self.services[service_id] = {"process": process, "name": service_name, "port": port, "log_file": log_file}

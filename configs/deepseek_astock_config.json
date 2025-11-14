@@ -1,0 +1,26 @@
+{
+  "agent_type": "BaseAgentAStock",
+  "market": "cn",
+  "date_range": {
+    "init_date": "2025-10-09",
+    "end_date": "2025-10-31"
+  },
+  "models": [
+    {
+      "name": "deepseek-chat",
+      "basemodel": "deepseek-chat",
+      "signature": "deepseek-chat",
+      "enabled": true,
+      "openai_base_url": "https://api.deepseek.com"
+    }
+  ],
+  "agent_config": {
+    "max_steps": 30,
+    "max_retries": 3,
+    "base_delay": 1.0,
+    "initial_cash": 100000.0
+  },
+  "log_config": {
+    "log_path": "./data/agent_data_astock"
+  }
+}
